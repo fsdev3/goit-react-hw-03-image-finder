@@ -6,7 +6,6 @@ import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Modal } from './Modal/Modal';
 import { Loader } from './Loader/Loader';
 import { Button } from './Button/Button';
-//
 
 export class App extends Component {
   state = {
@@ -28,7 +27,7 @@ export class App extends Component {
 
         const fetchResult = await fetchData(searchQuery, page);
         if (fetchResult.length === 0) {
-          throw new Error('Error, no results.');
+          throw new Error(`No results for ${searchQuery}`);
         }
         this.setState({
           images: [...this.state.images, ...fetchResult],
@@ -47,13 +46,12 @@ export class App extends Component {
     this.setState(({ showModal }) => ({ showModal: !showModal }));
   };
 
-  onLoadMore = () => {
-    return this.setState(prevState => ({ page: prevState.page + 1 }));
+  openModalWithImage = url => {
+    this.setState({ largeImageURL: url }, this.toggleModal);
   };
 
-  largeImageURL = url => {
-    this.toggleModal();
-    return this.setState({ largeImageURL: url });
+  onLoadMore = () => {
+    this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
   setMainState = value => {
@@ -64,6 +62,7 @@ export class App extends Component {
       showLoadMoreBtn: false,
     });
   };
+
   render() {
     const {
       searchQuery,
@@ -72,26 +71,25 @@ export class App extends Component {
       showLoadMoreBtn,
       showModal,
       images,
+      largeImageURL,
     } = this.state;
 
     return (
       <div>
-        <Searchbar
-          setMainState={this.setMainState}
-          searchQuery={this.state.searchQuery}
-        />
+        <Searchbar setMainState={this.setMainState} searchQuery={searchQuery} />
 
         <ImageGallery
           searchQuery={searchQuery}
           page={page}
           images={images}
-          setLargeImageUrl={this.largeImageURL}
+          openModalWithImage={this.openModalWithImage}
           setMainState={this.setMainState}
+          setLargeImageUrl={this.largeImageURL}
         />
         {showLoadMoreBtn && <Button click={this.onLoadMore} />}
         {showModal && (
           <Modal
-            largeImageUrl={this.state.largeImageURL}
+            largeImageUrl={largeImageURL}
             onCloseModal={this.toggleModal}
           />
         )}

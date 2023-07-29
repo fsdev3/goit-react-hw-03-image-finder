@@ -35,6 +35,6 @@ ImageGallery.propTypes = {
       webformatURL: PropTypes.string.isRequired,
     })
   ),
-  setLargeImageUrl: PropTypes.func.isRequired,
+  setLargeImageUrl: PropTypes.func,
   setMainState: PropTypes.func.isRequired,
 };
