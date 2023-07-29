@@ -1,47 +1,102 @@
-import { Component } from 'react';
-import { ImageGallery } from './ImageGallery/ImageGallery';
+import React, { Component } from 'react';
+import Notiflix from 'notiflix';
+import { fetchData } from 'services/fetch-api';
 import { Searchbar } from './Searchbar/Searchbar';
+import { ImageGallery } from './ImageGallery/ImageGallery';
+import { Modal } from './Modal/Modal';
+import { Loader } from './Loader/Loader';
+import { Button } from './Button/Button';
+//
 
 export class App extends Component {
   state = {
-    searchText: '',
+    images: [],
+    searchQuery: '',
+    page: 1,
+    largeImageURL: '',
+    showLoadMoreBtn: false,
+    showModal: false,
+    showLoader: false,
   };
-  // Для запиту використовуємо метод життєвого циуклу класового компонента componentDidUpdate.
-  // Робити запит на бекенд потрібно в Арр, достатньо однієї умови для запиту:
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      this.state.page !== prevState.page ||
-      this.state.query !== prevState.query
-    ) {
-      // fetch(
-      //   'https://pixabay.com/api/?q=cat&page=1&key=37263495-0dc17f57687021d8824007ffe&image_type=photo&orientation=horizontal&per_page=12'
-      // );
+
+  async componentDidUpdate(prevProps, prevState) {
+    const { searchQuery, page } = this.state;
+
+    if (page !== prevState.page || searchQuery !== prevState.searchQuery) {
+      try {
+        this.setState({ showLoader: true });
+
+        const fetchResult = await fetchData(searchQuery, page);
+        if (fetchResult.length === 0) {
+          throw new Error('Error, no results.');
+        }
+        this.setState({
+          images: [...this.state.images, ...fetchResult],
+          showLoadMoreBtn: fetchResult.length === 12,
+        });
+      } catch (error) {
+        this.setState({ showLoadMoreBtn: false });
+        Notiflix.Notify.warning(error.message);
+      } finally {
+        this.setState({ showLoader: false });
+      }
     }
   }
 
-  handleSearch = searchText => {
-    this.setState({ searchText });
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({ showModal: !showModal }));
   };
-  // Функція для запиту повинна бути в окремому файлі, в Арр її лише викликаємо.
+
+  onLoadMore = () => {
+    return this.setState(prevState => ({ page: prevState.page + 1 }));
+  };
+
+  largeImageURL = url => {
+    this.toggleModal();
+    return this.setState({ largeImageURL: url });
+  };
+
+  setMainState = value => {
+    this.setState({
+      page: 1,
+      images: [],
+      searchQuery: value,
+      showLoadMoreBtn: false,
+    });
+  };
   render() {
+    const {
+      searchQuery,
+      page,
+      showLoader,
+      showLoadMoreBtn,
+      showModal,
+      images,
+    } = this.state;
+
     return (
       <div>
-        <Searchbar searchText={this.state.searchText} />
-        <ImageGallery />
+        <Searchbar
+          setMainState={this.setMainState}
+          searchQuery={this.state.searchQuery}
+        />
 
-        {/* <Loader />
-      <Button />
-      <Modal /> */}
+        <ImageGallery
+          searchQuery={searchQuery}
+          page={page}
+          images={images}
+          setLargeImageUrl={this.largeImageURL}
+          setMainState={this.setMainState}
+        />
+        {showLoadMoreBtn && <Button click={this.onLoadMore} />}
+        {showModal && (
+          <Modal
+            largeImageUrl={this.state.largeImageURL}
+            onCloseModal={this.toggleModal}
+          />
+        )}
+        {showLoader && <Loader />}
       </div>
     );
   }
 }
-
-// Коли на бекенді закінчилися фото, приховуємо кнопку “Load more”.
-//  Для перевірки можна використовувати слова для пошуку “min” “max”.
-//  Один із варіантів реалізації приховування кнопки “Load more”
-// this.steState(prev =>({
-//  images: [...prev.images, ...hits],
-//  loadMore: this.state.page < Math.ceil(totalHits / 12 )
-// }))
-// Не забуваємо коректно опрацьовувати слухача для клавіатури в компоненті модального вікна.

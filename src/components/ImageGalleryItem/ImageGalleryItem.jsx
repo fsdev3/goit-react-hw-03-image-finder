@@ -1,11 +1,26 @@
-import { Component } from 'react';
+import PropTypes from 'prop-types';
+import { ImageGalleryItems } from './ImageGalleryItem.styled';
+//
+export const ImageGalleryItem = ({
+  smallImageUrl,
+  largeImageUrl,
+  showImage,
+}) => {
+  return (
+    <ImageGalleryItems>
+      <img
+        onClick={() => {
+          showImage(largeImageUrl);
+        }}
+        src={smallImageUrl}
+        alt=""
+      />
+    </ImageGalleryItems>
+  );
+};
 
-export class ImageGalleryItem extends Component {
-  render() {
-    return (
-      <li>
-        <img src="" alt="" />
-      </li>
-    );
-  }
-}
+ImageGalleryItem.propTypes = {
+  smallImageUrl: PropTypes.string.isRequired,
+  largeImageUrl: PropTypes.string.isRequired,
+  showImage: PropTypes.func.isRequired,
+};
