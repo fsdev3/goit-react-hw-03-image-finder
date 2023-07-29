@@ -2,10 +2,25 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import * as basicLightbox from 'basiclightbox';
 import 'basiclightbox/dist/basicLightbox.min.css';
+import { Overlay } from './Modal.styled';
 
 export class Modal extends Component {
+  closeModal = e => {
+    if (e.code === 'Escape') {
+      this.props.onCloseModal();
+    }
+  };
+  closeOverlay = e => {
+    if (e.target === e.currentTarget) {
+      this.props.onCloseModal();
+    }
+  };
+
   componentDidMount() {
-    this.showModal();
+    window.addEventListener('keydown', this.closeModal);
+  }
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.closeModal);
   }
 
   showModal = () => {
@@ -18,14 +33,8 @@ export class Modal extends Component {
       .show();
   };
 
-  closeOverlay = e => {
-    if (e.target === e.currentTarget) {
-      this.props.onCloseModal();
-    }
-  };
-
   render() {
-    return <div className="modal-overlay" onClick={this.closeOverlay}></div>;
+    return <Overlay onClick={this.closeOverlay}></Overlay>;
   }
 }
 
