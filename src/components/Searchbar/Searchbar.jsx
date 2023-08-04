@@ -1,49 +1,41 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import { Component } from 'react';
+import propTypes from 'prop-types';
 import { SearchForm, SearchHeader } from './Searchbar.styled';
-//
+
 export class Searchbar extends Component {
-  state = {
-    inputValue: '',
-  };
+  enterSearchData = event => {
+    event.preventDefault();
 
-  onSubmitForm = evt => {
-    const { inputValue } = this.state;
-    const { setMainState } = this.props;
-    evt.preventDefault();
-    if (inputValue === '' || inputValue === this.props.searchQuery) {
-      return;
-    }
-    setMainState(inputValue.trim().toLowerCase());
-  };
+    const searchData = event.currentTarget.elements.searchInput.value;
+    this.props.submitFunction(searchData);
 
-  onChangeInput = evt => {
-    return this.setState({ inputValue: evt.target.value });
+    event.currentTarget.reset();
   };
 
   render() {
     return (
       <SearchHeader>
-        <SearchForm onSubmit={this.onSubmitForm}>
+        <SearchForm onSubmit={this.enterSearchData}>
           <button type="submit">
-            <span>Search</span>
+            <img
+              src={require('../../images/icons8-search-50.png')}
+              alt="search"
+            />
           </button>
 
           <input
+            name="searchInput"
             type="text"
-            name="search"
-            value={this.state.inputValue}
             autoComplete="off"
             autoFocus
             placeholder="Search images and photos"
-            onChange={this.onChangeInput}
           />
         </SearchForm>
       </SearchHeader>
     );
   }
 }
+
 Searchbar.propTypes = {
-  setMainState: PropTypes.func.isRequired,
-  searchQuery: PropTypes.string.isRequired,
+  submitFunction: propTypes.func.isRequired,
 };

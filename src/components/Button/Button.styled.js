@@ -1,5 +1,12 @@
 import styled from 'styled-components';
 
+export const ButtonBox = styled.div`
+  padding-block: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 export const LoadButton = styled.button`
   margin-top: 10px;
   margin-left: 24px;

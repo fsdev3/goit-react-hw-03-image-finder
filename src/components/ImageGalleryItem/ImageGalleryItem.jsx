@@ -1,28 +1,16 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import propTypes from 'prop-types';
 import { ImageGalleryItems } from './ImageGalleryItem.styled';
-import * as basicLightbox from 'basiclightbox';
-import 'basiclightbox/dist/basicLightbox.min.css';
 
-export const ImageGalleryItem = ({ smallImageUrl, largeImageUrl }) => {
-  const showImage = () => {
-    basicLightbox
-      .create(
-        `
-      <img src="${largeImageUrl}" width="800" height="600">
-    `
-      )
-      .show();
-  };
-
+export const ImageGalleryItem = ({ largeImageLink, imageLink, onClick }) => {
   return (
-    <ImageGalleryItems>
-      <img onClick={showImage} src={smallImageUrl} alt="" />
+    <ImageGalleryItems onClick={() => onClick(largeImageLink)}>
+      <img src={imageLink} alt="" />
     </ImageGalleryItems>
   );
 };
 
 ImageGalleryItem.propTypes = {
-  smallImageUrl: PropTypes.string.isRequired,
-  largeImageUrl: PropTypes.string.isRequired,
+  largeImageLink: propTypes.string.isRequired,
+  imageLink: propTypes.string.isRequired,
+  onClick: propTypes.func.isRequired,
 };
