@@ -86,12 +86,7 @@ export class App extends Component {
           imageGalleryItems={this.state.images}
           itemOnClick={this.openModal}
         />
-        {this.state.images.length > 0 &&
-          (this.state.isLoadMore ? (
-            <Button onClick={this.loadMoreFunction} />
-          ) : (
-            !this.state.isLoadMore
-          ))}
+        {this.state.isLoadMore && <Button onClick={this.loadMoreFunction} />}
       </div>
     );
   }
