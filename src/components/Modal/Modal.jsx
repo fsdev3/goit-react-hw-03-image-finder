@@ -18,7 +18,7 @@ export class Modal extends Component {
   };
 
   handleClick = event => {
-    if (event.target === event.currentTarget || event.target) {
+    if (event.target === event.currentTarget) {
       this.props.eventFunction();
     }
   };
