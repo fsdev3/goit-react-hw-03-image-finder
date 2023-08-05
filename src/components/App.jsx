@@ -37,11 +37,17 @@ export class App extends Component {
         if (imagesData.length === 0) {
           throw new Error('Sorry, no results...');
         }
+        const isLoadMore = page < Math.ceil(imagesData.totalHits / 12);
         this.setState(prev => ({
           images: [...prev.images, ...imagesData.hits],
-          isLoadMore: prev.page < Math.ceil(imagesData.totalHits / 12),
+          isLoadMore: isLoadMore,
           totalHits: imagesData.totalHits,
         }));
+        if (!isLoadMore) {
+          Notiflix.Notify.warning(
+            'We are sorry, but you have reached the end of search results.'
+          );
+        }
       } catch (error) {
         this.setState({ isLoadMore: false, error });
       } finally {
@@ -84,10 +90,7 @@ export class App extends Component {
           (this.state.isLoadMore ? (
             <Button onClick={this.loadMoreFunction} />
           ) : (
-            !this.state.isLoadMore &&
-            Notiflix.Notify.warning(
-              'We are sorry, but you have reached the end of search results.'
-            )
+            !this.state.isLoadMore
           ))}
       </div>
     );

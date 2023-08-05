@@ -4,11 +4,11 @@ import { ModalDiv, Overlay } from './Modal.styled';
 
 export class Modal extends Component {
   componentDidMount() {
-    document.addEventListener('keydown', this.handleKeyDown.bind(this));
+    window.addEventListener('keydown', this.handleKeyDown);
   }
 
   componentWillUnmount() {
-    document.removeEventListener('keydown', this.handleKeyDown.bind(this));
+    window.removeEventListener('keydown', this.handleKeyDown);
   }
 
   handleKeyDown = event => {
