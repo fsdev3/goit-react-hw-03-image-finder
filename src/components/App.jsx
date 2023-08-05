@@ -17,7 +17,6 @@ export class App extends Component {
     isLoadMore: false,
     isModal: false,
     modalImageLink: '',
-    // isError: false,
   };
 
   getSearchResults = searchResultData => {
@@ -30,20 +29,13 @@ export class App extends Component {
   };
 
   async componentDidUpdate(prevProps, prevState) {
-    if (
-      this.state.page !== prevState.page ||
-      this.state.searchResult !== prevState.searchResult
-    ) {
+    const { searchResult, page } = this.state;
+    if (page !== prevState.page || searchResult !== prevState.searchResult) {
       this.setState({ isLoading: true });
       try {
-        const imagesData = await fetchImages(
-          this.state.searchResult,
-          this.state.page
-        );
+        const imagesData = await fetchImages(searchResult, page);
         if (imagesData.length === 0) {
-          Notiflix.Notify.failure(
-            'Sorry, there are no images matching your search query. Please try again.'
-          );
+          throw new Error('Sorry, no results...');
         }
         this.setState(prev => ({
           images: [...prev.images, ...imagesData.hits],
