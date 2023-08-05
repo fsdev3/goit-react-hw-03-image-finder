@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import Notiflix from 'notiflix';
 import { Searchbar } from './Searchbar/Searchbar';
 import { Modal } from './Modal/Modal';
 import { ImageGallery } from './ImageGallery/ImageGallery';
@@ -10,18 +11,18 @@ export class App extends Component {
   state = {
     images: [],
     isLoading: false,
-    isError: false,
     searchResult: '',
     page: 1,
     totalHits: 0,
     isLoadMore: false,
     isModal: false,
     modalImageLink: '',
+    // isError: false,
   };
 
   getSearchResults = searchResultData => {
     this.setState({
-      hasJustEntered: false,
+      isLoadMore: false,
       images: [],
       searchResult: searchResultData,
       page: 1,
@@ -35,17 +36,22 @@ export class App extends Component {
     ) {
       this.setState({ isLoading: true });
       try {
-        let imagesData = await fetchImages(
+        const imagesData = await fetchImages(
           this.state.searchResult,
           this.state.page
         );
+        if (imagesData.length === 0) {
+          Notiflix.Notify.failure(
+            'Sorry, there are no images matching your search query. Please try again.'
+          );
+        }
         this.setState(prev => ({
           images: [...prev.images, ...imagesData.hits],
           isLoadMore: prev.page < Math.ceil(imagesData.totalHits / 12),
           totalHits: imagesData.totalHits,
         }));
       } catch (error) {
-        this.setState({ isError: true, error });
+        this.setState({ isLoadMore: false, error });
       } finally {
         this.setState({ isLoading: false });
       }
@@ -86,10 +92,9 @@ export class App extends Component {
           (this.state.isLoadMore ? (
             <Button onClick={this.loadMoreFunction} />
           ) : (
-            !this.state.isLoadMore && (
-              <div>
-                We're sorry, but you've reached the end of search results.
-              </div>
+            !this.state.isLoadMore &&
+            Notiflix.Notify.warning(
+              'We are sorry, but you have reached the end of search results.'
             )
           ))}
       </div>
